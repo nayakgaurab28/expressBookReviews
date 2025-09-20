@@ -3,7 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
-
+const axios = require("axios");
 
 public_users.post("/register", (req,res) => {
   const {username, password}=req.body;
@@ -78,5 +78,53 @@ public_users.get('/review/:isbn',function (req, res) {
     return res.status(404).json({ message: `Book with ISBN ${isbn} not found` });
   }
 });
+
+async function getBooksAsync() {
+    try {
+      const response = await axios.get("http://localhost:5000/");
+      console.log("Books retrieved using async-await:");
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching books (Async/Await):", error.message);
+    }
+}
+// Fetch book by ISBN using Promises
+function getBookByISBN(isbn) {
+    axios.get(`http://localhost:5000/isbn/${isbn}`)
+      .then(response => {
+        console.log(`Book details for ISBN ${isbn} (Promise):`);
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error(`Error fetching book by ISBN ${isbn} (Promise):`, error.message);
+      });
+}
+// Fetch books by Author
+async function getBooksByAuthorAsync(author) {
+    try {
+      const response = await axios.get(`http://localhost:5000/author/${author}`);
+      console.log(`Books by author "${author}" (Async/Await):`);
+      console.log(response.data);
+    } catch (error) {
+      console.error(`Error fetching books by author "${author}" (Async/Await):`, error.message);
+    }
+}
+// Fetch book by Title using Promises
+function getBooksByTitle(title) {
+    axios.get(`http://localhost:5000/title/${title}`)
+      .then(response => {
+        console.log(`Books with title "${title}" (Promise):`);
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error(`Error fetching books with title "${title}" (Promise):`, error.message);
+      });
+  }
+if (require.main === module) {
+    //getBooksAsync();
+    //getBookByISBN("2");
+    //getBooksByAuthorAsync("Samuel Beckett");
+    getBooksByTitle("One Thousand and One Nights");
+}
 
 module.exports.general = public_users;
